@@ -11,7 +11,8 @@ namespace Core
             _tables = []; 
         }
 
-        public void createTable(string tableName, List<Schema> columns)
+	// One of the fields of the schema must be unique
+        public void CreateTable(string tableName, Schema columns)
         {
             // for each column, we also need the size  
 
@@ -20,41 +21,67 @@ namespace Core
                 throw new InvalidOperationException("Table already exists");
             }
 
-            _tables[tableName] = new Table(tableName, columns); 
+            // TODO: verify that atleast one of the fields is unique; 
+
+            _tables[tableName] = new Table(tableName, columns);
+
+            // create the database file and the relevant data structures 
+
+            // figure out how database operations work. 
+
+            using (var streamWriter = new StreamWriter("database.db", true))
+            {
+                streamWriter.WriteLine(tableName);
+            }
+
+
+            return; 
         }
 
-	public void updateTable(string tableName, List<Schema> updatedColumns) 
-	{
-		if (!_tables.ContainsKey(tableName)) 
-		{
-			throw new KeyNotFoundException("Table does not exist"); 
-		}
-	}
-
-	public void deleteTable(string tableName) 
+	public void UpdateTable(string tableName, Schema updatedColumns) 
 	{
 		if (!_tables.ContainsKey(tableName)) 
 		{
 			throw new KeyNotFoundException("Table does not exist"); 
 		}
 
-		_tables.Remove(tableName); 
+		_tables[tableName].UpdateSchema(updatedColumns); 
+
 	}
 
-	public void clearDatabase() {
-		_tables.Clear(); 
+	public void DeleteTable(string tableName) 
+	{
+		if (!_tables.ContainsKey(tableName)) 
+		{
+			throw new KeyNotFoundException("Table does not exist"); 
+		}
+
+		_tables.Remove(tableName);
+
+
+		return; 
 	}
 
-        public void outputTableFormat(string tableName)
+	public void clearDatabase(bool warning = false) {
+        if (warning)
+        {
+            _tables.Clear();
+        }
+
+        return; 
+	}
+
+        public void OutputTableFormat(string tableName)
         {
             if (!_tables.ContainsKey(tableName))
             {
                 throw new KeyNotFoundException("Table does not exist");
             }
 
+            var schema = _tables[tableName].GetSchema();
         }
 
-        public void outputTableData(string tableName)
+        public void OutputTableData(string tableName)
         {
             if (!_tables.ContainsKey(tableName))
             {
@@ -64,15 +91,22 @@ namespace Core
 
     }
 
-  
-    
-    public class Schema
+
+    public class IColumnFormat(string columnName, long columnSize, bool isPrimaryKey)
     {
-        public required string ColumnName; 
-        public required long byteSize;
+        public string ColumnName { get; set; } = columnName;
+        public long ColumnSize { get; set; } = columnSize;
+
+        public bool IsPrimaryKey { get; set; } = isPrimaryKey;
     }
 
-    public class Parameters 
+    public class Schema(string name, List<IColumnFormat> rows)
+    {
+        public string Name { get; set; } = name;
+        public List<IColumnFormat> Rows { get; set; } = rows;
+    }
+
+    public class Parameters/**/ 
     {
     }
 
