@@ -58,7 +58,6 @@ namespace Core
 
 		_tables.Remove(tableName);
 
-
 		return; 
 	}
 
@@ -96,7 +95,6 @@ namespace Core
     {
         public string ColumnName { get; set; } = columnName;
         public long ColumnSize { get; set; } = columnSize;
-
         public bool IsPrimaryKey { get; set; } = isPrimaryKey;
     }
 
@@ -106,11 +104,15 @@ namespace Core
         public List<IColumnFormat> Rows { get; set; } = rows;
     }
 
-    public class Parameters/**/ 
+    // <summary>Paramters that can be customised when the user is inserting things into the database</summary>
+    public class Parameters
     {
+
+	    
     }
 
     public class Config 
     {
+
     }
 }
